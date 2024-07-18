@@ -1,9 +1,9 @@
-# hello_world.py
+# dag.py
 
 from airflow import DAG
 
-from airflow.operators.python_operator import PythonOperator
-from airflow.operators.bash_operator import BashOperator
+from airflow.operators.python import PythonOperator
+from airflow.operators.bash import BashOperator
 from datetime import datetime
 
 
@@ -14,7 +14,7 @@ def print_hello():
 dag = DAG(
     "hello_world",
     description="Simple tutorial DAG",
-    schedule_interval="0 3 * * *",
+    schedule_interval="0 2 * * *",
     start_date=datetime(2024, 6, 1),
     catchup=True,
 )
