@@ -17,6 +17,7 @@ def hello_etl():
     def get_dict_name():
         return {"first_name": "Kaushik", "last_name": "Bangera"}
 
+    @task
     def get_age():
         return 20
 
