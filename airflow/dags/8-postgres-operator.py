@@ -1,6 +1,7 @@
 from airflow.decorators import dag, task
 from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 from datetime import datetime
+from time import sleep
 
 # when catchup: False -> to backfill run below command
 # airflow dags backfill hello_world -s 2024-07-01 -e 2024-07-22
@@ -14,13 +15,29 @@ from datetime import datetime
     catchup=False,
 )
 def hello_etl():
-    create_table = SQLExecuteQueryOperator(
-        task_id="create_table",
-        conn_id="postgres_conn",
-        autocommit=True,
-        database="test",
-        sql="CREATE TABLE IF NOT EXISTS hello (first_name VARCHAR, last_name VARCHAR, age INTEGER);",
-    )
+
+    @task
+    def create_table():
+        # sleep(2)
+        SQLExecuteQueryOperator(
+            task_id="create_table",
+            conn_id="postgres_conn",
+            autocommit=True,
+            database="test",
+            sql="CREATE TABLE IF NOT EXISTS hello (first_name VARCHAR, last_name VARCHAR, age INTEGER);",
+        ).execute({})
+
+    @task
+    def insert_data(first_name, last_name, age):
+
+        sql = f"INSERT INTO hello VALUES ('{first_name}', '{last_name}', {age});"
+        SQLExecuteQueryOperator(
+            task_id="insert_table",
+            conn_id="postgres_conn",
+            autocommit=True,
+            database="test",
+            sql=sql,
+        ).execute({})
 
     @task(multiple_outputs=True)
     def get_dict_name():
@@ -40,7 +57,7 @@ def hello_etl():
         first_name=dict_name["first_name"], last_name=dict_name["last_name"], age=age
     )
 
-    create_table
+    create_table() >> insert_data(dict_name["first_name"], dict_name["last_name"], age)
 
 
 hello_etl()
