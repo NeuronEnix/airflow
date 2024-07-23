@@ -3,8 +3,23 @@ from airflow.providers.common.sql.operators.sql import SQLExecuteQueryOperator
 from datetime import datetime
 from time import sleep
 
-# when catchup: False -> to backfill run below command
-# airflow dags backfill hello_world -s 2024-07-01 -e 2024-07-22
+"""
+First need to add database connection in Airflow UI
+In Airflow UI on the top ribbon go to: Admin -> Connections -> Add (+)
+In the form
+    Connection Id: postgres_conn; (a name for the connection)
+    Connection Type: Postgres
+    Host: 127.0.0.1
+    Database: test; (table name)
+    Login: airflow; (a user name)
+    Password: airflow; (a password)
+    Port: 5432;
+"""
+
+"""
+when catchup: False -> to backfill run below command
+airflow dags backfill hello_world -s 2024-07-01 -e 2024-07-22
+"""
 
 
 @dag(
